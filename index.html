@@ -11,8 +11,12 @@
       padding: 40px;
       background: #f0f8f5;
     }
+    input, button {
+      padding: 8px;
+      margin: 5px;
+    }
     .weather-card {
-      margin-top: 30px;
+      margin-top: 20px;
       display: inline-block;
       background: #fff;
       padding: 20px;
@@ -33,82 +37,58 @@
       color: red;
       font-weight: bold;
     }
-    #debug {
-      margin-top: 20px;
-      font-size: 14px;
-      text-align: left;
-      background: #eee;
-      padding: 10px;
-      border-radius: 8px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-      white-space: pre-wrap;
-    }
   </style>
 </head>
 <body>
   <h1>🌱 Krishi Mitr</h1>
   <h2>Weather Forecast</h2>
 
-  <input type="text" id="cityInput" placeholder="Enter city" style="padding:8px;">
-  <button onclick="getWeather()" style="padding:8px;">Get Weather</button>
+  <input type="text" id="city" placeholder="Enter city">
+  <button id="getWeather">Get Weather</button>
 
-  <div id="weatherResult"></div>
+  <div id="result"></div>
   <div id="errorMsg"></div>
-  <div id="debug"></div> <!-- Debug info will show here -->
 
   <script>
-    function debugLog(message) {
-      document.getElementById("debug").innerText += message + "\n";
-    }
+    const apiKey = "019fab8681fe8c95a827cddd074a17fb";
 
-    async function getWeather() {
-      const city = document.getElementById("cityInput").value;
-      const apiKey = "019fab8681fe8c95a827cddd074a17fb"; // your API key
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-
-      const resultDiv = document.getElementById("weatherResult");
+    document.getElementById("getWeather").addEventListener("click", async () => {
+      const city = document.getElementById("city").value.trim();
+      const resultDiv = document.getElementById("result");
       const errorDiv = document.getElementById("errorMsg");
-      const debugDiv = document.getElementById("debug");
 
       resultDiv.innerHTML = "";
       errorDiv.innerHTML = "";
-      debugDiv.innerText = "";
 
       if (!city) {
-        errorDiv.innerHTML = "⚠️ Please enter a city name.";
+        errorDiv.innerHTML = "⚠️ Please enter a city name!";
         return;
       }
 
       try {
-        debugLog("Fetching: " + url);
-        const response = await fetch(url);
-        debugLog("Response status: " + response.status);
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+        );
+        const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error("City not found (status " + response.status + ")");
+        if (data.cod !== 200) {
+          errorDiv.innerHTML = `❌ Error: ${data.message}`;
+          return;
         }
 
-        const data = await response.json();
-        debugLog("API Data: " + JSON.stringify(data, null, 2));
-
-        const weatherHTML = `
+        resultDiv.innerHTML = `
           <div class="weather-card">
             <h3>${data.name}, ${data.sys.country}</h3>
-            <p><b>🌡 Temperature:</b> ${data.main.temp} °C</p>
-            <p><b>🌥 Condition:</b> ${data.weather[0].description}</p>
-            <p><b>💧 Humidity:</b> ${data.main.humidity}%</p>
-            <p><b>💨 Wind Speed:</b> ${data.wind.speed} m/s</p>
+            <p>🌡️ Temperature: ${data.main.temp}°C</p>
+            <p>☁️ Condition: ${data.weather[0].description}</p>
+            <p>💧 Humidity: ${data.main.humidity}%</p>
+            <p>💨 Wind Speed: ${data.wind.speed} m/s</p>
           </div>
         `;
-        resultDiv.innerHTML = weatherHTML;
-
-      } catch (error) {
-        debugLog("Weather API Error: " + error.message);
-        errorDiv.innerHTML = "⚠️ Error: " + error.message;
+      } catch {
+        errorDiv.innerHTML = "⚠️ Failed to fetch weather data!";
       }
-    }
+    });
   </script>
 </body>
 </html>
