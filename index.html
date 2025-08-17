@@ -28,6 +28,11 @@
       margin: 6px 0;
       font-size: 16px;
     }
+    #errorMsg {
+      margin-top: 20px;
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -37,8 +42,8 @@
   <input type="text" id="cityInput" placeholder="Enter city" style="padding:8px;">
   <button onclick="getWeather()" style="padding:8px;">Get Weather</button>
 
-  <!-- Result will show here -->
   <div id="weatherResult"></div>
+  <div id="errorMsg"></div>
 
   <script src="script.js"></script>
 </body>
