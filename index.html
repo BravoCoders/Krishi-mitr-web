@@ -33,6 +33,18 @@
       color: red;
       font-weight: bold;
     }
+    #debug {
+      margin-top: 20px;
+      font-size: 14px;
+      text-align: left;
+      background: #eee;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -44,7 +56,59 @@
 
   <div id="weatherResult"></div>
   <div id="errorMsg"></div>
+  <div id="debug"></div> <!-- Debug info will show here -->
 
-  <script src="script.js"></script>
+  <script>
+    function debugLog(message) {
+      document.getElementById("debug").innerText += message + "\n";
+    }
+
+    async function getWeather() {
+      const city = document.getElementById("cityInput").value;
+      const apiKey = "019fab8681fe8c95a827cddd074a17fb"; // your API key
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+      const resultDiv = document.getElementById("weatherResult");
+      const errorDiv = document.getElementById("errorMsg");
+      const debugDiv = document.getElementById("debug");
+
+      resultDiv.innerHTML = "";
+      errorDiv.innerHTML = "";
+      debugDiv.innerText = "";
+
+      if (!city) {
+        errorDiv.innerHTML = "⚠️ Please enter a city name.";
+        return;
+      }
+
+      try {
+        debugLog("Fetching: " + url);
+        const response = await fetch(url);
+        debugLog("Response status: " + response.status);
+
+        if (!response.ok) {
+          throw new Error("City not found (status " + response.status + ")");
+        }
+
+        const data = await response.json();
+        debugLog("API Data: " + JSON.stringify(data, null, 2));
+
+        const weatherHTML = `
+          <div class="weather-card">
+            <h3>${data.name}, ${data.sys.country}</h3>
+            <p><b>🌡 Temperature:</b> ${data.main.temp} °C</p>
+            <p><b>🌥 Condition:</b> ${data.weather[0].description}</p>
+            <p><b>💧 Humidity:</b> ${data.main.humidity}%</p>
+            <p><b>💨 Wind Speed:</b> ${data.wind.speed} m/s</p>
+          </div>
+        `;
+        resultDiv.innerHTML = weatherHTML;
+
+      } catch (error) {
+        debugLog("Weather API Error: " + error.message);
+        errorDiv.innerHTML = "⚠️ Error: " + error.message;
+      }
+    }
+  </script>
 </body>
 </html>
