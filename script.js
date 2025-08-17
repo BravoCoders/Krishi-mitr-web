@@ -3,17 +3,28 @@ async function getWeather() {
   const apiKey = "019fab8681fe8c95a827cddd074a17fb"; // your API key
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
+  const resultDiv = document.getElementById("weatherResult");
+  const errorDiv = document.getElementById("errorMsg");
+
+  resultDiv.innerHTML = "";
+  errorDiv.innerHTML = "";
+
   if (!city) {
-    alert("Please enter a city name");
+    errorDiv.innerHTML = "⚠️ Please enter a city name.";
     return;
   }
 
   try {
+    console.log("Fetching:", url); // 🔎 check API request
     const response = await fetch(url);
+    console.log("Response status:", response.status); // 🔎 check response code
+
     if (!response.ok) {
-      throw new Error("City not found");
+      throw new Error("City not found (status " + response.status + ")");
     }
+
     const data = await response.json();
+    console.log("API Data:", data); // 🔎 log full API response
 
     const weatherHTML = `
       <div class="weather-card">
@@ -24,8 +35,10 @@ async function getWeather() {
         <p><b>💨 Wind Speed:</b> ${data.wind.speed} m/s</p>
       </div>
     `;
-    document.getElementById("weatherResult").innerHTML = weatherHTML;
+    resultDiv.innerHTML = weatherHTML;
+
   } catch (error) {
-    document.getElementById("weatherResult").innerHTML = `<p style="color:red;">⚠️ ${error.message}</p>`;
+    console.error("Weather API Error:", error); // 🔎 log error details
+    errorDiv.innerHTML = "⚠️ Error: " + error.message;
   }
 }
