@@ -16,14 +16,16 @@ async function getWeather() {
     const data = await response.json();
 
     const weatherHTML = `
-      <p><b>City:</b> ${data.name}, ${data.sys.country}</p>
-      <p><b>Temperature:</b> ${data.main.temp} °C</p>
-      <p><b>Weather:</b> ${data.weather[0].description}</p>
-      <p><b>Humidity:</b> ${data.main.humidity}%</p>
-      <p><b>Wind Speed:</b> ${data.wind.speed} m/s</p>
+      <div class="weather-card">
+        <h3>${data.name}, ${data.sys.country}</h3>
+        <p><b>🌡 Temperature:</b> ${data.main.temp} °C</p>
+        <p><b>🌥 Condition:</b> ${data.weather[0].description}</p>
+        <p><b>💧 Humidity:</b> ${data.main.humidity}%</p>
+        <p><b>💨 Wind Speed:</b> ${data.wind.speed} m/s</p>
+      </div>
     `;
     document.getElementById("weatherResult").innerHTML = weatherHTML;
   } catch (error) {
-    document.getElementById("weatherResult").innerHTML = "⚠️ Error: " + error.message;
+    document.getElementById("weatherResult").innerHTML = `<p style="color:red;">⚠️ ${error.message}</p>`;
   }
 }
